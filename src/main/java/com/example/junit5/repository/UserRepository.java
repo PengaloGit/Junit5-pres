@@ -3,6 +3,7 @@ package com.example.junit5.repository;
 import com.example.junit5.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserRepository {
     List<User> users = List.of(new User(1, "ahmed@example.com", true),
@@ -15,4 +16,8 @@ public class UserRepository {
             new User(8, "saeed@example.com", false),
             new User(9, "hana@example.com", true),
             new User(10, "ali@example.com", false));
+
+    public Optional<User> getUserById(int userId) {
+        return users.stream().filter(user -> user.id() == userId).findFirst();
+    }
 }

@@ -4,6 +4,7 @@ import com.example.junit5.model.Invoice;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public class InvoiceRepository {
     List<Invoice> invoices = List.of(
@@ -33,4 +34,16 @@ public class InvoiceRepository {
 
             new Invoice(16, new BigDecimal("800.00"), 10, false)
     );
+
+    public Optional<Invoice> getInvoiceById(int invoiceId) {
+        return invoices.stream().filter(invoice -> invoice.id() == invoiceId).findFirst();
+    }
+
+    public List<Invoice> getRushDeliveryInvoices() {
+        return invoices.stream().filter(Invoice::isRushDelivery).toList();
+    }
+
+    public List<Invoice> getInvoicesByUserId(int userId) {
+        return invoices.stream().filter(invoice -> invoice.userId() == userId).toList();
+    }
 }
