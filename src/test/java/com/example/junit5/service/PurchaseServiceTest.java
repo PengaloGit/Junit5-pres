@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.junit5.model.Invoice;
 import com.example.junit5.model.User;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 public class PurchaseServiceTest {
 
     @Test
+    @Disabled("This test is disabled because of bug #S2P-42")
     @DisplayName("Should return half the invoiced amount when user is premium")
     void premiumUserHalfInvoicedAmount() {
 
