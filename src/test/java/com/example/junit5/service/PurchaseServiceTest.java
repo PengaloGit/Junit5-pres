@@ -23,7 +23,11 @@ class PurchaseServiceTest {
         var invoicedAmount = purchaseService.getInvoicedAmount(user, invoice);
 
         // then
-        assertNotNull(invoicedAmount, "invoicedAmount should never be null");
+        assertNotNull(invoicedAmount, ()->{
+            //calling an external api for the message construction or logging
+            //very costly operation
+            return "invoicedAmount should never be null";
+        });// lambda expression
         assertEquals(new BigDecimal("50.00"), invoicedAmount, "invoicedAmount should be half the invoice amount");
 
     }
