@@ -23,8 +23,8 @@ class PurchaseServiceTest {
         var invoicedAmount = purchaseService.getInvoicedAmount(user, invoice);
 
         // then
-        assertNotNull(invoicedAmount);
-        assertEquals(new BigDecimal("50.00"), invoicedAmount);
+        assertNotNull(invoicedAmount, "invoicedAmount should never be null");
+        assertEquals(new BigDecimal("50.00"), invoicedAmount, "invoicedAmount should be half the invoice amount");
 
     }
 
@@ -40,8 +40,8 @@ class PurchaseServiceTest {
         var invoicedAmount = purchaseService.getInvoicedAmount(user, invoice);
 
         // then
-        assertNotNull(invoicedAmount);
-        assertEquals(new BigDecimal("100.0"), invoicedAmount);
+        assertNotNull(invoicedAmount, "invoicedAmount should never be null");
+        assertEquals(new BigDecimal("100.0"), invoicedAmount, "invoicedAmount should be equal to the invoice amount");
 
     }
 
@@ -57,8 +57,8 @@ class PurchaseServiceTest {
         var shippingAmount = purchaseService.getShippingAmount(user, invoice);
 
         // then
-        assertNotNull(shippingAmount);
-        assertEquals(new BigDecimal("0.0"), shippingAmount);
+        assertNotNull(shippingAmount, "shippingAmount should never be null");
+        assertEquals(new BigDecimal("0.0"), shippingAmount, "shippingAmount should be zero");
     }
 
 
@@ -74,8 +74,8 @@ class PurchaseServiceTest {
         var shippingAmount = purchaseService.getShippingAmount(user, invoice);
 
         // then
-        assertNotNull(shippingAmount);
-        assertEquals(new BigDecimal("0.0"), shippingAmount);
+        assertNotNull(shippingAmount, "shippingAmount should never be null");
+        assertEquals(new BigDecimal("0.0"), shippingAmount, "shippingAmount should be zero");
     }
 
     @Test
@@ -90,7 +90,7 @@ class PurchaseServiceTest {
         var shippingAmount = purchaseService.getShippingAmount(user, invoice);
 
         // then
-        assertNotNull(shippingAmount);
-        assertEquals(new BigDecimal("20.00"), shippingAmount);
+        assertNotNull(shippingAmount, "shippingAmount should never be null");
+        assertEquals(new BigDecimal("20.00"), shippingAmount, "shippingAmount should be 20% of the invoice amount");
     }
 }
