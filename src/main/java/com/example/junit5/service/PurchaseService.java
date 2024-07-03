@@ -28,7 +28,8 @@ public class PurchaseService {
 
     public List<InvoiceDTO> getFinalInvoicesByUser(int userId) {
         return invoiceRepository
-                .getInvoicesByUserId(userId).stream()
+                .getInvoicesByUserId(userId)
+                .stream()
                 .map(Invoice::id)
                 .map(invoiceId -> getFinalInvoicedAmount(userId, invoiceId))
                 .map(amount -> InvoiceDTO.of(amount, userId))
