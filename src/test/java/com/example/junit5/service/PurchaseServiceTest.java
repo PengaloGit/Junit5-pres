@@ -1,20 +1,18 @@
 package com.example.junit5.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.example.junit5.model.Invoice;
 import com.example.junit5.model.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-class PurchaseServiceTest {
+public class PurchaseServiceTest {
 
     @Test
-    void should_return_half_the_invoiced_amount_when_user_is_premium() {
+    @DisplayName("Should return half the invoiced amount when user is premium")
+    void premiumUserHalfInvoicedAmount() {
 
         // given
         PurchaseService purchaseService = new PurchaseService();
@@ -32,12 +30,12 @@ class PurchaseServiceTest {
                     return "invoicedAmount should never be null";
                 }),
                 () -> assertEquals(new BigDecimal("51.00"), invoicedAmount, "invoicedAmount should be half the invoice amount")
-        );// should fail
-
+        ); // should fail
     }
 
     @Test
-    void should_return_the_invoiced_amount_when_user_is_not_premium() {
+    @DisplayName("Should return the invoiced amount when user is not premium")
+    void nonPremiumUserFullInvoicedAmount() {
 
         // given
         PurchaseService purchaseService = new PurchaseService();
@@ -50,11 +48,11 @@ class PurchaseServiceTest {
         // then
         assertNotNull(invoicedAmount, "invoicedAmount should never be null");
         assertEquals(new BigDecimal("100.0"), invoicedAmount, "invoicedAmount should be equal to the invoice amount");
-
     }
 
     @Test
-    void should_return_zero_shipping_amount_when_user_is_premium() {
+    @DisplayName("Should return zero shipping amount when user is premium")
+    void premiumUserZeroShippingAmount() {
 
         // given
         PurchaseService purchaseService = new PurchaseService();
@@ -69,9 +67,9 @@ class PurchaseServiceTest {
         assertEquals(new BigDecimal("0.0"), shippingAmount, "shippingAmount should be zero");
     }
 
-
     @Test
-    void should_return_zero_shipping_amount_when_invoice_is_not_rushed_delivery() {
+    @DisplayName("Should return zero shipping amount when invoice is not rushed delivery")
+    void nonRushedDeliveryZeroShippingAmount() {
 
         // given
         PurchaseService purchaseService = new PurchaseService();
@@ -87,7 +85,8 @@ class PurchaseServiceTest {
     }
 
     @Test
-    void should_return_twenty_percent_of_the_invoiced_amount_as_shipping_amount_when_invoice_is_rushed_delivery_and_user_not_premium() {
+    @DisplayName("Should return 20% of the invoiced amount as shipping amount when invoice is rushed delivery and user is not premium")
+    void nonPremiumUserRushedDeliveryShippingAmount() {
 
         // given
         PurchaseService purchaseService = new PurchaseService();
