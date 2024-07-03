@@ -5,9 +5,12 @@ import com.example.junit5.model.User;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PurchaseServiceTest {
 
@@ -23,12 +26,14 @@ class PurchaseServiceTest {
         var invoicedAmount = purchaseService.getInvoicedAmount(user, invoice);
 
         // then
-        assertNotNull(invoicedAmount, ()->{
-            //calling an external api for the message construction or logging
-            //very costly operation
-            return "invoicedAmount should never be null";
-        });// lambda expression
-        assertEquals(new BigDecimal("50.00"), invoicedAmount, "invoicedAmount should be half the invoice amount");
+        assertAll("invoicedAmount checks",
+                () -> assertNotNull(invoicedAmount, () -> {
+                    // Simulate calling an external API for message construction
+                    // This operation is only performed if the assertion fails
+                    return "invoicedAmount should never be null";
+                }),
+                () -> assertEquals(new BigDecimal("50.00"), invoicedAmount, "invoicedAmount should be half the invoice amount")
+        );// should fail
 
     }
 
@@ -96,5 +101,42 @@ class PurchaseServiceTest {
         // then
         assertNotNull(shippingAmount, "shippingAmount should never be null");
         assertEquals(new BigDecimal("20.00"), shippingAmount, "shippingAmount should be 20% of the invoice amount");
+    }
+
+
+    @Test
+    void should_return_final_invoices_by_user() {
+
+        // given
+        PurchaseService purchaseService = new PurchaseService();
+
+        // when
+        var finalInvoices = purchaseService.getFinalInvoicesByUser(1);
+
+        // then
+        assertAll("finalInvoices",
+                () -> assertNotNull(finalInvoices, "Final invoices should not be null"),//assertion1
+                () -> assertEquals(2, finalInvoices.size(), "Final invoices should contain 2 items"),//assertion2
+                () -> assertEquals(new BigDecimal("75.000"), finalInvoices.get(0).amount(), "First invoice amount should be 75.000"),//assertion3
+                () -> assertEquals(new BigDecimal("150.000"), finalInvoices.get(1).amount(), "Second invoice amount should be 150.000")//assertion4
+        );
+
+        //happy path
+        //everything is working as expected
+    }
+
+    @Test
+    void should_throw_exception_when_user_not_found() {
+
+        // given
+        PurchaseService purchaseService = new PurchaseService();
+
+        // when
+        //user doesn't exist
+        // then
+        assertThrows(NoSuchElementException.class, () -> purchaseService.getFinalInvoicesByUser(20));// we can assert exceptions
+
+        //edge case
+        //user not found
     }
 }
