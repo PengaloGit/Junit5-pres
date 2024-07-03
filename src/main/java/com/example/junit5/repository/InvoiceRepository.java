@@ -32,7 +32,9 @@ public class InvoiceRepository {
             new Invoice(14, new BigDecimal("650.00"), 9, false),
             new Invoice(15, new BigDecimal("700.00"), 9, true),
 
-            new Invoice(16, new BigDecimal("800.00"), 10, false)
+            new Invoice(16, new BigDecimal("800.00"), 10, false),
+            
+            new Invoice(17, new BigDecimal("800.00"), 20, false)
     );
 
     public Optional<Invoice> getInvoiceById(int invoiceId) {

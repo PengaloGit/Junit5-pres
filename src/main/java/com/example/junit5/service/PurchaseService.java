@@ -8,6 +8,7 @@ import com.example.junit5.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class PurchaseService {
 
@@ -28,7 +29,8 @@ public class PurchaseService {
 
     public List<InvoiceDTO> getFinalInvoicesByUser(int userId) {
         return invoiceRepository
-                .getInvoicesByUserId(userId).stream()
+                .getInvoicesByUserId(userId)
+                .stream()
                 .map(Invoice::id)
                 .map(invoiceId -> getFinalInvoicedAmount(userId, invoiceId))
                 .map(amount -> InvoiceDTO.of(amount, userId))
@@ -36,7 +38,7 @@ public class PurchaseService {
     }
 
     private BigDecimal getFinalInvoicedAmount(int userId, int invoiceId) {
-        var user = userRepository.getUserById(userId).orElseThrow();
+        var user = userRepository.getUserById(userId).orElseThrow(()->new NoSuchElementException("User not found"));
         var invoice = invoiceRepository.getInvoiceById(invoiceId).orElseThrow();
 
         return getInvoicedAmount(user, invoice).add(getShippingAmount(user, invoice));
