@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class PurchaseServiceTest {
 
@@ -23,12 +25,14 @@ class PurchaseServiceTest {
         var invoicedAmount = purchaseService.getInvoicedAmount(user, invoice);
 
         // then
-        assertNotNull(invoicedAmount, ()->{
-            //calling an external api for the message construction or logging
-            //very costly operation
-            return "invoicedAmount should never be null";
-        });// lambda expression
-        assertEquals(new BigDecimal("50.00"), invoicedAmount, "invoicedAmount should be half the invoice amount");
+        assertAll("invoicedAmount checks",
+                () -> assertNull(invoicedAmount, () -> {
+                    // Simulate calling an external API for message construction
+                    // This operation is only performed if the assertion fails
+                    return "invoicedAmount should never be null";
+                }),
+                () -> assertEquals(new BigDecimal("51.00"), invoicedAmount, "invoicedAmount should be half the invoice amount")
+        );// should fail
 
     }
 
