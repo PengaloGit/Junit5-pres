@@ -7,11 +7,11 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.IndicativeSentencesGeneration;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Purchase Service Tests")
 public class PurchaseServiceTest {
@@ -188,26 +188,29 @@ public class PurchaseServiceTest {
     @DisplayName("Checking out parameterized tests feature in junit5")
     class ParamsTests {
 
+        record DiscountTestData(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount) {
+        }
+
         @ParameterizedTest
         @MethodSource("provideDiscountsForValidDiscountTest")
         @DisplayName("Test valid discount scenarios")
-        void testValidDiscount(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount) {
+        void testValidDiscount(DiscountTestData discountTestData) {
             // given
             PurchaseService purchaseService = new PurchaseService();
-            Invoice invoice = new Invoice(1, invoiceAmount, 1, false);
+            Invoice invoice = new Invoice(1, discountTestData.invoiceAmount(), 1, false);
 
             // when
-            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discount);
+            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discountTestData.discount());
 
             // then
-            assertEquals(expectedDiscountAmount, actualDiscountAmount);
+            assertEquals(0, discountTestData.expectedDiscountAmount().compareTo(actualDiscountAmount), "Expected: " + discountTestData.expectedDiscountAmount() + " but was: " + actualDiscountAmount);
         }
 
-        private static Stream<Arguments> provideDiscountsForValidDiscountTest() {
+        private static Stream<Named<DiscountTestData>> provideDiscountsForValidDiscountTest() {
             return Stream.of(
-                    Arguments.of(new BigDecimal("100.0"), new BigDecimal("0.2"), new BigDecimal("20.00")), // 20% discount
-                    Arguments.of(new BigDecimal("100.0"), new BigDecimal("0.6"), new BigDecimal("50.00")), // 60% discount capped at 50%
-                    Arguments.of(new BigDecimal("100.0"), new BigDecimal("-0.1"), BigDecimal.ZERO)         // Negative discount returns zero
+                    Named.of("20% discount", new DiscountTestData(new BigDecimal("100.0"), new BigDecimal("0.2"), new BigDecimal("20.00"))), // 20% discount
+                    Named.of("60% discount capped at 50%", new DiscountTestData(new BigDecimal("100.0"), new BigDecimal("0.6"), new BigDecimal("50.00"))), // 60% discount capped at 50%
+                    Named.of("Negative discount returns zero", new DiscountTestData(new BigDecimal("100.0"), new BigDecimal("-0.1"), BigDecimal.ZERO))       // Negative discount returns zero
             );
         }
     }
