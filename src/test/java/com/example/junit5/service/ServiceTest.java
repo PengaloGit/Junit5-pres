@@ -23,7 +23,7 @@ public class ServiceTest {
         // I don't want this test to depend on the devs' machine specs
         // I want this test to only be executed when in the CI/CD pipeline
     }
-    
+
     @Test
     @DisplayName("Should exceed timeout of 10 ms and wait for task completion")
     void testTimeoutExceeded() {

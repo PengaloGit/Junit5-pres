@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.IndicativeSentencesGeneration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestReporter;
+
 import java.math.BigDecimal;
 
 @DisplayName("Purchase Service Tests")
@@ -139,6 +141,16 @@ public class PurchaseServiceTest {
         void if_it_is_negative() {
         }
 
+    }
+
+    @Nested
+    @DisplayName("Dependency injection in junit5")
+    class DependencyInjectionTests {
+
+        @Test
+        @DisplayName("Checking out the dependency injection")
+        void testDependencyInjection() {
+        }
     }
 
 
