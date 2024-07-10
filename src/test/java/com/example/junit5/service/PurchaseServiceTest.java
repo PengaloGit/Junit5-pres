@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
@@ -192,26 +193,22 @@ public class PurchaseServiceTest {
         }
 
         @ParameterizedTest
-        @MethodSource("provideDiscountsForValidDiscountTest")
+        @CsvSource(delimiter = '|', textBlock = """
+            100.0 | 0.2 | 20.00
+            100.0 | 0.6 | 50.00
+            100.0 | -0.1 | 0.00
+            """)
         @DisplayName("Test valid discount scenarios")
-        void testValidDiscount(DiscountTestData discountTestData) {
+        void testValidDiscount(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount) {
             // given
             PurchaseService purchaseService = new PurchaseService();
-            Invoice invoice = new Invoice(1, discountTestData.invoiceAmount(), 1, false);
+            Invoice invoice = new Invoice(1, invoiceAmount, 1, false);
 
             // when
-            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discountTestData.discount());
+            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discount);
 
             // then
-            assertEquals(0, discountTestData.expectedDiscountAmount().compareTo(actualDiscountAmount), "Expected: " + discountTestData.expectedDiscountAmount() + " but was: " + actualDiscountAmount);
-        }
-
-        private static Stream<Named<DiscountTestData>> provideDiscountsForValidDiscountTest() {
-            return Stream.of(
-                    Named.of("20% discount", new DiscountTestData(new BigDecimal("100.0"), new BigDecimal("0.2"), new BigDecimal("20.00"))), // 20% discount
-                    Named.of("60% discount capped at 50%", new DiscountTestData(new BigDecimal("100.0"), new BigDecimal("0.6"), new BigDecimal("50.00"))), // 60% discount capped at 50%
-                    Named.of("Negative discount returns zero", new DiscountTestData(new BigDecimal("100.0"), new BigDecimal("-0.1"), BigDecimal.ZERO))       // Negative discount returns zero
-            );
+            assertEquals(0,expectedDiscountAmount.compareTo(actualDiscountAmount), "Expected: " + expectedDiscountAmount + " but was: " + actualDiscountAmount);
         }
     }
 
