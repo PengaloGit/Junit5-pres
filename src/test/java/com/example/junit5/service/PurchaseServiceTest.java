@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Purchase Service Tests")
 public class PurchaseServiceTest {
@@ -177,6 +177,59 @@ public class PurchaseServiceTest {
             assertEquals(amount,
                     new BigDecimal(discountPercentage).multiply(new BigDecimal("100.0")),
                     "coupon discount amount should be equal to the discount percentage");
+        }
+    }
+
+    @Nested
+    @DisplayName("Checking out parameterized tests feature in junit5")
+    class ParamsTests {
+
+        @Test
+        @DisplayName("Test valid discount of 20%")
+        void testValidDiscount() {
+            // given
+            PurchaseService purchaseService = new PurchaseService();
+            Invoice invoice = new Invoice(1, new BigDecimal("100.0"), 1, false);
+            BigDecimal discount = new BigDecimal("0.2"); // 20% discount
+
+            // when
+            BigDecimal expectedDiscountAmount = new BigDecimal("20.00");
+            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discount);
+
+            // then
+            assertEquals(expectedDiscountAmount, actualDiscountAmount);
+        }
+
+        @Test
+        @DisplayName("Test discount greater than 50% (should cap at 50%)")
+        void testExcessiveDiscount() {
+            // given
+            PurchaseService purchaseService = new PurchaseService();
+            Invoice invoice = new Invoice(1, new BigDecimal("100.0"), 1, false);
+            BigDecimal discount = new BigDecimal("0.6"); // 60% discount
+
+            // when
+            BigDecimal expectedDiscountAmount = new BigDecimal("50.00"); // 50% of 100
+            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discount);
+
+            // then
+            assertEquals(expectedDiscountAmount, actualDiscountAmount);
+        }
+
+        @Test
+        @DisplayName("Test negative discount (should return zero)")
+        void testNegativeDiscount() {
+            // given
+            PurchaseService purchaseService = new PurchaseService();
+            Invoice invoice = new Invoice(1, new BigDecimal("100.0"), 1, false);
+            BigDecimal discount = new BigDecimal("-0.1"); // -10% discount
+
+            // when
+            BigDecimal expectedDiscountAmount = BigDecimal.ZERO;
+            BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discount);
+
+            // then
+            assertEquals(expectedDiscountAmount, actualDiscountAmount);
         }
     }
 

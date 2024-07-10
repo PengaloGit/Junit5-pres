@@ -44,6 +44,12 @@ public class PurchaseService {
     }
 
     public BigDecimal getCouponDiscountAmount(Invoice invoice, BigDecimal discount) {
+        if(discount.compareTo(BigDecimal.ZERO) <= 0) {
+            discount = BigDecimal.ZERO;
+        }
+        else if(discount.compareTo(new BigDecimal("0.5")) > 0) {
+            discount = new BigDecimal("0.5");
+        }
         return invoice.amount().multiply(discount);
     }
 
