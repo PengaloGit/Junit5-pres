@@ -192,14 +192,22 @@ public class PurchaseServiceTest {
         record DiscountTestData(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount) {
         }
 
-        @ParameterizedTest
+        @ParameterizedTest(name = "Scenario {index} : {3}, invoice amount: {0}, discount: {1}, expected discount amount(output): {2}")
         @CsvSource(delimiter = '|', textBlock = """
-            100.0 | 0.2 | 20.00
-            100.0 | 0.6 | 50.00
-            100.0 | -0.1 | 0.00
-            """)
+                #---------------------------------------------------------------------------------------------------
+                # INVOICED_AMOUNT | DISCOUNT |   EXPECTED_DISCOUNTED_AMOUNT |             DESCRIPTION
+                #---------------------------------------------------------------------------------------------------
+                  100.0           | 0.2      | 20.00                        | 20% discount should be 20.00
+                #----------------------------------------------------------------------------------------------------
+                 100.0            | 0.6      | 50.00                        | 60% discount should be caped at 50.00
+                #----------------------------------------------------------------------------------------------------
+                 100.0            |-0.1      | 0.00                         | negative discount should be 0.00
+                #----------------------------------------------------------------------------------------------------
+                """)
+
+        //NB toutes les lignes commancantes par # sont des ignorées
         @DisplayName("Test valid discount scenarios")
-        void testValidDiscount(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount) {
+        void testValidDiscount(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount, String description) {
             // given
             PurchaseService purchaseService = new PurchaseService();
             Invoice invoice = new Invoice(1, invoiceAmount, 1, false);
