@@ -4,8 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.junit5.model.Invoice;
 import com.example.junit5.model.User;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.IndicativeSentencesGeneration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
@@ -107,4 +110,37 @@ public class PurchaseServiceTest {
             assertEquals(new BigDecimal("20.00"), shippingAmount, "shippingAmount should be 20% of the invoice amount");
         }
     }
+
+    @Nested
+    @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+    class this_is_just_a_test {
+
+        @Test
+        void class_method_test() {
+        }
+
+        @Test
+        @DisplayName("A display overrides the display name generator")
+        void if_it_is_negative() {
+        }
+
+    }
+
+    @Nested
+    @IndicativeSentencesGeneration(separator = " with a well written ", generator = ReplaceUnderscores.class)
+    class this_is_just_another_test {
+
+        @Test
+        void class_method_test() {
+        }
+
+        @Test
+        @DisplayName("A display overrides the display name generator")
+        void if_it_is_negative() {
+        }
+
+    }
+
+
+
 }
