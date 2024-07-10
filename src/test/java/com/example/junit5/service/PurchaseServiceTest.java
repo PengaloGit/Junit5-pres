@@ -1,19 +1,22 @@
 package com.example.junit5.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.example.junit5.model.Invoice;
 import com.example.junit5.model.User;
-import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.IndicativeSentencesGeneration;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestReporter;
 
 import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Purchase Service Tests")
 public class PurchaseServiceTest {
@@ -153,6 +156,29 @@ public class PurchaseServiceTest {
         }
     }
 
+
+    @Nested
+    @DisplayName("Checking out repeated tests feature in junit5")
+    class RepeatedTests {
+
+        @Test
+        @DisplayName("testing coupon discount amount")
+        @RepeatedTest(10)
+        void repeatedTest() {
+            // given
+            PurchaseService purchaseService = new PurchaseService();
+            double discountPercentage = Math.random();
+
+            // when
+            BigDecimal amount = purchaseService.getCouponDiscountAmount(
+                    new Invoice(1, new BigDecimal("100.0"), 1, false),
+                    new BigDecimal(discountPercentage));
+            // then
+            assertEquals(amount,
+                    new BigDecimal(discountPercentage).multiply(new BigDecimal("100.0")),
+                    "coupon discount amount should be equal to the discount percentage");
+        }
+    }
 
 
 }

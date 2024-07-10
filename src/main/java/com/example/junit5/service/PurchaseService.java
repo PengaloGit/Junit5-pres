@@ -43,4 +43,8 @@ public class PurchaseService {
         return getInvoicedAmount(user, invoice).add(getShippingAmount(user, invoice));
     }
 
+    public BigDecimal getCouponDiscountAmount(Invoice invoice, BigDecimal discount) {
+        return invoice.amount().multiply(discount);
+    }
+
 }
