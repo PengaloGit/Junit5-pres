@@ -6,22 +6,27 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
+import org.junit.jupiter.api.DynamicNode;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.IndicativeSentencesGeneration;
-import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 @DisplayName("Purchase Service Tests")
 public class PurchaseServiceTest {
@@ -189,19 +194,18 @@ public class PurchaseServiceTest {
     @DisplayName("Checking out parameterized tests feature in junit5")
     class ParamsTests {
 
-        record DiscountTestData(BigDecimal invoiceAmount, BigDecimal discount, BigDecimal expectedDiscountAmount) {
-        }
-
         @ParameterizedTest(name = "Scenario {index} : {3}, invoice amount: {0}, discount: {1}, expected discount amount(output): {2}")
         @CsvSource(delimiter = '|', textBlock = """
                 #---------------------------------------------------------------------------------------------------
                 # INVOICED_AMOUNT | DISCOUNT |   EXPECTED_DISCOUNTED_AMOUNT |             DESCRIPTION
                 #---------------------------------------------------------------------------------------------------
-                  100.0           | 0.2      | 20.00                        | 20% discount should be 20.00
+                 100.0            | 0.2      | 20.00                        | 20% discount should be 20.00
                 #----------------------------------------------------------------------------------------------------
                  100.0            | 0.6      | 50.00                        | 60% discount should be caped at 50.00
                 #----------------------------------------------------------------------------------------------------
                  100.0            |-0.1      | 0.00                         | negative discount should be 0.00
+                #----------------------------------------------------------------------------------------------------
+                 100.0            |-0.2      | 0.00                         | pls work my job depends on it :'(
                 #----------------------------------------------------------------------------------------------------
                 """)
 
@@ -216,7 +220,81 @@ public class PurchaseServiceTest {
             BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, discount);
 
             // then
-            assertEquals(0,expectedDiscountAmount.compareTo(actualDiscountAmount), "Expected: " + expectedDiscountAmount + " but was: " + actualDiscountAmount);
+            assertEquals(0, expectedDiscountAmount.compareTo(actualDiscountAmount), "Expected: " + expectedDiscountAmount + " but was: " + actualDiscountAmount);
+        }
+    }
+
+    @Nested
+    class dynamic {
+        @TestFactory
+        @DisplayName("Test valid discount scenarios")
+        Stream<DynamicTest> testValidDiscount() {
+            record TestCase(BigDecimal invoiceAmount,
+                            BigDecimal discount,
+                            BigDecimal expectedDiscountAmount,
+                            String description) {
+
+            }
+
+            Collection<TestCase> testCases = new ArrayList<>();
+            testCases.add(new TestCase(new BigDecimal("100.0"), new BigDecimal("0.2"), new BigDecimal("20.00"), "20% discount should be 20.00"));
+            testCases.add(new TestCase(new BigDecimal("100.0"), new BigDecimal("0.6"), new BigDecimal("50.00"), "60% discount should be capped at 50.00"));
+            testCases.add(new TestCase(new BigDecimal("100.0"), new BigDecimal("-0.1"), new BigDecimal("0.00"), "negative discount should be 0.00"));
+            testCases.add(new TestCase(new BigDecimal("100.0"), new BigDecimal("-0.2"), new BigDecimal("0.00"), "pls work my job depends on it :'("));
+
+            PurchaseService purchaseService = new PurchaseService();
+
+            return testCases.stream().map(testCase -> dynamicTest(
+                    testCase.description,
+                    () -> {
+                        // given
+                        Invoice invoice = new Invoice(1, testCase.invoiceAmount, 1, false);
+
+                        // when
+                        BigDecimal actualDiscountAmount = purchaseService.getCouponDiscountAmount(invoice, testCase.discount);
+
+                        // then
+                        assertEquals(0, testCase.expectedDiscountAmount.compareTo(actualDiscountAmount), "Expected: " + testCase.expectedDiscountAmount + " but was: " + actualDiscountAmount);
+                    }
+            ));
+        }
+
+        @TestFactory
+        Stream<DynamicNode> dynamicOrganizationTests() {
+            return Stream.of(
+                    dynamicContainer("Loukmane's tutorials Corp.", Stream.of(
+                            dynamicContainer("HR Department", Stream.of(
+                                    dynamicTest("HR has 5 employees", () -> assertEquals(5, getEmployeeCount("HR"))),
+                                    dynamicTest("HR policy compliance", () -> assertTrue(isPolicyCompliant("HR")))
+                            )),
+                            dynamicContainer("IT Department", Stream.of(
+                                    dynamicTest("IT has 10 employees", () -> assertEquals(10, getEmployeeCount("IT"))),
+                                    dynamicTest("IT policy compliance", () -> assertTrue(isPolicyCompliant("IT"))),
+                                    dynamicContainer("IT Sub-Department - Development", Stream.of(
+                                            dynamicTest("Development has 6 employees", () -> assertEquals(6, getEmployeeCount("Development"))),
+                                            dynamicTest("Development policy compliance", () -> assertTrue(isPolicyCompliant("Development")))
+                                    )),
+                                    dynamicContainer("IT Sub-Department - Operations", Stream.of(
+                                            dynamicTest("Operations has 4 employees", () -> assertEquals(4, getEmployeeCount("Operations"))),
+                                            dynamicTest("Operations policy compliance", () -> assertTrue(isPolicyCompliant("Operations")))
+                                    ))
+                            ))
+                    ))
+            );
+        }
+
+        private int getEmployeeCount(String department) {
+            return switch (department) {
+                case "HR" -> 5;
+                case "IT" -> 10;
+                case "Development" -> 6;
+                case "Operations" -> 4;
+                default -> 0;
+            };
+        }
+
+        private boolean isPolicyCompliant(String department) {
+            return true;
         }
     }
 

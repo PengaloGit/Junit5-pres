@@ -1,0 +1,10 @@
+user@example.com,true
+invalid-email,false
+another.user@domain.com,true
+user.name@domain.co,true
+user@domain,false
+user@domain..com,false
+user@domain.c,true
+user@domain123.com,true
+user@domain-name.com,true
+user@.com,false
