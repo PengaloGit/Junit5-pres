@@ -34,8 +34,9 @@ public class PurchaseServiceTest {
 
         @Test
         @DisplayName("Should return half the invoiced amount when user is premium")
-        void premiumUserHalfInvoicedAmount() {
+        void premiumUserHalfInvoicedAmount() throws InterruptedException {
             // given
+            Thread.sleep(10000); //10seconds
             PurchaseService purchaseService = new PurchaseService();
             var user = new User(1, "loukmane@gmail.com", true);
             var invoice = new Invoice(1, new BigDecimal("100.0"), 1, false);
@@ -55,8 +56,9 @@ public class PurchaseServiceTest {
 
         @Test
         @DisplayName("Should return the invoiced amount when user is not premium")
-        void nonPremiumUserFullInvoicedAmount() {
+        void nonPremiumUserFullInvoicedAmount() throws InterruptedException {
             // given
+            Thread.sleep(10000); //10seconds
             PurchaseService purchaseService = new PurchaseService();
             var user = new User(1, "loukmane@gmail.com", false);
             var invoice = new Invoice(1, new BigDecimal("100.0"), 1, false);
