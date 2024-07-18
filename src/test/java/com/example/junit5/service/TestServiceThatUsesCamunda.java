@@ -8,30 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestServiceThatUsesCamunda {
-
-    private static final CamundaServer camundaServer = CamundaServer.builder().withUrl("localhost").onPort(9090).create();
-
-    @BeforeAll
-    static void setUpAll() {
-        if (!camundaServer.isRunning()) {
-            camundaServer.serve();
-        }
-    }
-
-    @BeforeEach
-    void setUp() {
-        System.out.println("Resetting Camunda server");
-        camundaServer.resetState();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        if (camundaServer.isRunning()) {
-            System.out.println("Stopping Camunda server");
-            camundaServer.shutDown();
-        }
-    }
+class TestServiceThatUsesCamunda extends CamundaTest {
 
     @Test
     void getsFooFromRemoteServer() {
@@ -39,7 +16,7 @@ class TestServiceThatUsesCamunda {
 
         // given
         var client = new ServiceThatUsesCamunda();
-        camundaServer.whenEndPointCalled("/count-instance").thenRespondWith(100583); //it should create a mock
+        camundaServer.whenEndPointCalled("/count-instance").thenRespondWith(100583); //it should mock the http request
         // when
         Integer foo = client.getInstanceCount();
         // then
